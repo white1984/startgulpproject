@@ -26,9 +26,16 @@ gulp.task('js', function() {
 	.pipe(browserSync.reload({stream: true}));
 });
 
+gulp.task('common-js', function() {
+	return gulp.src([
+		'app/js/common.js'
+		])
+	.pipe(browserSync.reload({stream: true}));
+});
+
 gulp.task('browser-sync', function() {
 	browserSync({
-		proxy: "gulp/app",
+		proxy: "testgulp/app",
 		notify: false
 	});
 });
@@ -43,9 +50,10 @@ gulp.task('sass', function() {
 	.pipe(browserSync.reload({stream: true}));
 });
 
-gulp.task('watch', ['sass', 'js', 'browser-sync'], function() {
+gulp.task('watch', ['sass', 'js', 'browser-sync' , 'common-js'], function() {
 	gulp.watch('app/sass/**/*.sass', ['sass']);
-	gulp.watch(['libs/**/*.js', 'app/js/common.js'], ['js']);
+	gulp.watch('libs/**/*.js', ['js']);
+	gulp.watch('app/js/common.js', ['common-js']);
 	gulp.watch('app/*.php', browserSync.reload);
 });
 

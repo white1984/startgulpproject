@@ -10,13 +10,3 @@
 		@else
 			src: url('#{$file-path}.eot')
 			src: url('#{$file-path}.eot?#iefix') format('embedded-opentype'), url('#{$file-path}.woff') format('woff'), url('#{$file-path}.ttf') format('truetype')
-
-@mixin placeholder
-	&::-webkit-input-placeholder
-		@content
-	&:-moz-placeholder
-		@content
-	&::-moz-placeholder
-		@content
-	&:-ms-input-placeholder 
-		@content

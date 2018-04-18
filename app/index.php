@@ -24,7 +24,7 @@
 	<!-- iOS Safari -->
 	<meta name="apple-mobile-web-app-status-bar-style" content="#000">
 
-	<style>body { opacity: 0; overflow-x: hidden; } html { background-color: #fff; }</style>
+	<link rel="stylesheet" href="css/main.min.css">
 
 </head>
 
@@ -35,20 +35,16 @@
 		<div class="row">
 
 			<div class="col-sm-8 col-sm-offset-2">
-				
-				<h1 style="display: inline-flex; padding: 5px 10px; border: 2px solid #333">White.gulpStart</h1>
-				<p>Оригинал <a href="#https://github.com/agragregra/start_html">тут</a></p>
+
+				<h1><a href="https://github.com/agragregra/optimizedhtml-start-template"></a>Original</h1>				
 
 			</div>
 			
 		</div>
 
 	</div>
-	
-	<link rel="stylesheet" href="css/main.min.css">
-	<script src="js/jquery.min.js"></script>
+
 	<script src="js/scripts.min.js"></script>
-	<script src="js/common.js"></script>
 
 </body>
 </html>

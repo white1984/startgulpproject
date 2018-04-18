@@ -12,13 +12,23 @@ var gulp           = require('gulp'),
 		autoprefixer   = require('gulp-autoprefixer'),
 		ftp            = require('vinyl-ftp'),
 		notify         = require("gulp-notify"),
-		spritesmith    = require('gulp.spritesmith');
+		rsync          = require('gulp-rsync');
 
-// Скрипты проекта
+// Пользовательские скрипты проекта
 
-gulp.task('js', function() {
+gulp.task('common-js', function() {
 	return gulp.src([
-		// js libs
+		'app/js/common.js',
+		])
+	.pipe(concat('common.min.js'))
+	.pipe(uglify())
+	.pipe(gulp.dest('app/js'));
+});
+
+gulp.task('js', ['common-js'], function() {
+	return gulp.src([
+		'app/libs/jquery/dist/jquery.min.js',
+		'app/js/common.min.js', // Всегда в конце
 		])
 	.pipe(concat('scripts.min.js'))
 	// .pipe(uglify()) // Минимизировать весь js (на выбор)
@@ -26,17 +36,14 @@ gulp.task('js', function() {
 	.pipe(browserSync.reload({stream: true}));
 });
 
-gulp.task('common-js', function() {
-	return gulp.src([
-		'app/js/common.js'
-		])
-	.pipe(browserSync.reload({stream: true}));
-});
-
 gulp.task('browser-sync', function() {
 	browserSync({
-		proxy: "testgulp/app",
-		notify: false
+		server: {
+			baseDir: 'app'
+		},
+		notify: false,
+		// tunnel: true,
+		// tunnel: "projectmane", //Demonstration page: http://projectmane.localtunnel.me
 	});
 });
 
@@ -50,23 +57,22 @@ gulp.task('sass', function() {
 	.pipe(browserSync.reload({stream: true}));
 });
 
-gulp.task('watch', ['sass', 'js', 'browser-sync' , 'common-js'], function() {
+gulp.task('watch', ['sass', 'js', 'browser-sync'], function() {
 	gulp.watch('app/sass/**/*.sass', ['sass']);
-	gulp.watch('libs/**/*.js', ['js']);
-	gulp.watch('app/js/common.js', ['common-js']);
-	gulp.watch('app/*.php', browserSync.reload);
+	gulp.watch(['libs/**/*.js', 'app/js/common.js'], ['js']);
+	gulp.watch('app/*.html', browserSync.reload);
 });
 
 gulp.task('imagemin', function() {
 	return gulp.src('app/img/**/*')
-	.pipe(cache(imagemin()))
+	.pipe(cache(imagemin())) // Cache Images
 	.pipe(gulp.dest('dist/img')); 
 });
 
 gulp.task('build', ['removedist', 'imagemin', 'sass', 'js'], function() {
 
 	var buildFiles = gulp.src([
-		'app/*.php',
+		'app/*.html',
 		'app/.htaccess',
 		]).pipe(gulp.dest('dist'));
 
@@ -76,8 +82,6 @@ gulp.task('build', ['removedist', 'imagemin', 'sass', 'js'], function() {
 
 	var buildJs = gulp.src([
 		'app/js/scripts.min.js',
-		'app/js/jquery.min.js',
-		'app/js/common.js'
 		]).pipe(gulp.dest('dist/js'));
 
 	var buildFonts = gulp.src([
@@ -105,12 +109,18 @@ gulp.task('deploy', function() {
 
 });
 
-gulp.task('sprite', function () {
-	var spriteData = gulp.src('app/img/sprite/allImg/*.png').pipe(spritesmith({
-		imgName: 'sprite.png',
-		cssName: 'sprite.css'
+gulp.task('rsync', function() {
+	return gulp.src('dist/**')
+	.pipe(rsync({
+		root: 'dist/',
+		hostname: 'username@yousite.com',
+		destination: 'yousite/public_html/',
+		// include: ['*.htaccess'], // Скрытые файлы, которые необходимо включить в деплой
+		recursive: true,
+		archive: true,
+		silent: false,
+		compress: true
 	}));
-	return spriteData.pipe(gulp.dest('app/img/sprite'));
 });
 
 gulp.task('removedist', function() { return del.sync('dist'); });
